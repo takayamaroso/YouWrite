@@ -1,0 +1,46 @@
+{% extends 'news/base.html' %}
+
+{% block content %}
+    {% for article in articles %}
+        <div class="article">
+            <h1><a href="{% url 'article_detail' pk=article.pk %}">{{ article.title }}</a></h1>
+            <p>{{ article.text|linebreaks|truncatechars:"100" }}</p>
+            <a href="{% url 'article_detail' pk=article.pk %}">コメント: {{ article.comments.count }}</a>
+            <script>
+                document.write("<br><nobr style='color: rgb(211, 211, 6)'>");
+                    var num = 0;
+                    while ( 5 > num){
+                        if ( {{ article.avg_value }} >= num+1){
+                            document.write("★");
+                        }else{
+                            document.write("☆");
+                        }
+                        
+                        num += 1;
+                    }
+                    document.write("</nobr>");
+            </script>
+            {{ article.avg_value|floatformat }}
+        </div>
+        <div class="date">
+                {{ article.published_date }}
+            </div>
+            <p>{{ article.author }}</p>
+        <br>
+    {% endfor %}
+    <div class="pagination">
+            <span class="step-links">
+                {% if articles.has_previous %}
+                    <a href="?page={{ articles.previous_page_number }}">最初</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ articles.number }} of {{ articles.paginator.num_pages }}.
+                </span>
+        
+                {% if articles.has_next %}
+                    <a href="?page={{ articles.next_page_number }}">次</a>
+                {% endif %}
+            </span>
+        </div>
+{% endblock content %}

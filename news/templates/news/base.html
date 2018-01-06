@@ -1,0 +1,119 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>try</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap -->
+        <link href="{% static 'css/theme.min.css' %}" rel="stylesheet" media="screen">
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <!--ヘッダー-->
+        <!--ナビゲーションバー-->
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbarEexample3">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">
+                        <img src="{% static 'image/i3.png' %}"style="height:20px;">		<!--アイコンの画像-->
+                    </a>
+                        <a class="navbar-brand text-center" href="/">YouWrite</a>		<!--タイトル-->
+                </div>
+                <!--メニュー-->
+                <div class="collapse navbar-collapse" id="navbarEexample3">
+                    <ul class="nav navbar-nav">
+                    <!--投稿ボタン-->
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a href="{% url 'article_new' %}" class="btn btn-primary btn-lg" title="記事作成">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> 記事投稿
+                                </a>
+                            </li>
+                    <!--投稿ボタン終わり-->
+                    <!--メニュー-->
+                            <li><a href="{% url 'article_draft_list' %}">未公開記事一覧</a></li>
+                        {% endif %}
+
+                    <!--メニュー終わり-->
+                    </ul>
+                <!--ドロップダウンメニュー-->
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            {% if user.is_authenticated %}
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>{{ user.username }}<span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="{% url 'logout' %}">ログアウト</a></li>
+                                </ul>
+                            {% else %}
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>アカウント<span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="{% url 'login' %}">ログイン</a></li>
+                                    <li><a  href="{% url 'signup' %}" >新規登録</a></li>
+                                </ul>
+                            {% endif %}
+                        </li>
+                    </ul>
+                <!--ドロップダウンメニュー終わり-->
+                        <!--ドロップダウンメニュー-->
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                                <span class="glyphicon" aria-hidden="true"></span>検索オプション<span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">新着順</a></li>
+                                <li><a href="#">閲覧数順</a></li>
+                                <li><a href="{% url 'article_evaluationlist' %}">評価順</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                <!--ドロップダウンメニュー終わり-->
+        <!--フォーム-->
+                    <form class="navbar-form navbar-right" role="search">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="検索キーワード">
+                            <div class="input-group-btn">
+                                <button class="btn btn-default" type="submit">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+
+                </div>
+        <!--フォーム終わり-->
+            </div>
+        </nav>
+        <!--ナビゲーションバー終わり-->
+        <!--ヘッダー終わり-->
+        <div class="content container">
+            <div class="row">
+                <div class="col-md-8">
+                {% block content %}
+                {% endblock %}
+                </div>
+            </div>
+        </div>
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="https://code.jquery.com/jquery.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    </body>
+</html>
