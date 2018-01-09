@@ -7,3 +7,4 @@ db.sqlite3
 .vscode
 media/*
 !no-image.jpg
+sqlite3.exe
