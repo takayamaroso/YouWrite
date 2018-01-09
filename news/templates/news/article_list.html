@@ -3,12 +3,15 @@
 {% block content %}
     {% for article in articles %}
         <div class="article">
+            <img src="{{ article.image_url|default_if_none:'' }}" style="height:150px;"/>
             <h1><a href="{% url 'article_detail' pk=article.pk %}">{{ article.title }}</a></h1>
             <p>{{ article.text|linebreaks|truncatechars:"100" }}</p>
+            <br clear="left">
             <a href="{% url 'article_detail' pk=article.pk %}">コメント: {{ article.comments.count }}</a>
+            <br><nobr style='color: rgb(211, 105, 6)'>
+            {{ article.avg_value|floatformat }}
             <script>
-                document.write("<br><nobr style='color: rgb(211, 211, 6)'>");
-                    var num = 0;
+                var num = 0;
                     while ( 5 > num){
                         if ( {{ article.avg_value }} >= num+1){
                             document.write("★");
@@ -18,16 +21,16 @@
                         
                         num += 1;
                     }
-                    document.write("</nobr>");
             </script>
-            {{ article.avg_value|floatformat }}
-        </div>
-        <div class="date">
+            </nobr>
+            <div class="date">
                 {{ article.published_date }}
             </div>
-            <p>{{ article.author }}</p>
-        <br>
+            <p>著者：{{ article.author }}</p>
+            <hr>
+        </div>
     {% endfor %}
+    
     <div class="pagination">
             <span class="step-links">
                 {% if articles.has_previous %}

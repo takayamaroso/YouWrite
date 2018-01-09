@@ -1,0 +1,30 @@
+.article img {
+    float:left;
+}
+.article h1{
+    overflow:hidden;
+}
+.article p{
+    overflow:hidden;
+}
+
+.article a{
+    overflow:hidden;
+}
+
+.article nobr{
+    overflow:hidden;
+}
+.article br{
+    overflow:hidden;
+}
+.article script{
+    overflow:hidden;
+}
+
+.article hr{
+	height: 10px;
+	border: 0;
+	box-shadow: 0 10px 10px -10px #8c8b8b inset;
+}
+  

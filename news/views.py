@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from .forms import ArticleForm, CommentForm
+from .forms import ArticleForm, CommentForm, Search
 from .models import Article, Comment
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
@@ -12,35 +12,42 @@ from django.views.generic.edit import FormView, CreateView
 from django.views.generic.list import ListView
 from django.db.models import Avg, Count
 # Create your views here.
-class Article_List(ListView):
-    model = Article
-    template_name = 'news/article_list.html'
-    def get(self, request, **kwargs):
-        if request.method == "POST":
-            article_list = Article.objects\
-                .filter(published_date__lte=timezone.now())\
-                .filter(title__iexact=request.POST["form-control"])\
-                .order_by('-published_date')
-        else:
-            article_list = Article.objects\
-                .filter(published_date__lte=timezone.now())\
-                .annotate(avg_value=Avg('comments__evaluation_value'))\
-                .order_by('-published_date')
-        paginator = Paginator(article_list, 10) #ページ表示数
-        page = request.GET.get('page')
-        try:
-            articles = paginator.page(page)
-        except PageNotAnInteger:
-            articles = paginator.page(1)
-        except EmptyPage:
-            articles = paginator.page(paginator.num_pages) #ページが範囲外の時最終ページを表示する
-        return render(request, 'news/article_list.html', {'articles':articles})
+
+def article_list(request):
+    if request.GET.get('search') is None:
+        article_list = Article.objects\
+            .filter(published_date__lte=timezone.now())\
+            .annotate(avg_value=Avg('comments__evaluation_value'))\
+            .order_by('-published_date')
+    else:
+        article_list = Article.objects\
+            .filter(published_date__lte=timezone.now())\
+            .filter(title__contains=request.GET.get('search'))\
+            .annotate(avg_value=Avg('comments__evaluation_value'))\
+            .order_by('-published_date')
+    paginator = Paginator(article_list, 10) #ページ表示数
+    page = request.GET.get('page')
+    try:
+        articles = paginator.page(page)
+    except PageNotAnInteger:
+        articles = paginator.page(1)
+    except EmptyPage:
+        articles = paginator.page(paginator.num_pages) #ページが範囲外の時最終ページを表示する
+    return render(request, 'news/article_list.html', {'articles':articles})
 
 #投稿順
 def article_oldlist(request):
-    article_list = Article.objects\
-        .filter(published_date__lte=timezone.now())\
-        .order_by('published_date')
+    if request.GET.get('search') is None:
+        article_list = Article.objects\
+            .filter(published_date__lte=timezone.now())\
+            .annotate(avg_value=Avg('comments__evaluation_value'))\
+            .order_by('published_date')
+    else:
+        article_list = Article.objects\
+            .filter(published_date__lte=timezone.now())\
+            .filter(title__contains=request.GET.get('search'))\
+            .annotate(avg_value=Avg('comments__evaluation_value'))\
+            .order_by('published_date')
     paginator = Paginator(article_list, 10) #ページ表示数
     page = request.GET.get('page')
     try:
@@ -53,10 +60,17 @@ def article_oldlist(request):
 
 #評価順表示
 def article_evaluationlist(request):
-    article_list = Article.objects\
-        .filter(published_date__lte=timezone.now())\
-        .annotate(avg_value=Avg('comments__evaluation_value'))\
-        .order_by('-avg_value')
+    if request.GET.get('search') is None:
+        article_list = Article.objects\
+            .filter(published_date__lte=timezone.now())\
+            .annotate(avg_value=Avg('comments__evaluation_value'))\
+            .order_by('-avg_value')
+    else:
+        article_list = Article.objects\
+            .filter(published_date__lte=timezone.now())\
+            .filter(title__contains=request.GET.get('search'))\
+            .annotate(avg_value=Avg('comments__evaluation_value'))\
+            .order_by('-avg_value')
     paginator = Paginator(article_list, 10) #ページ表示数
     page = request.GET.get('page')
     try:
@@ -72,35 +86,52 @@ def article_detail(request, pk):
     #article.objects.order_by('-comments__created_date')
     return render(request, 'news/article_detail.html', {'article': article})
 
+"""
+class ArticleCreateView(CreateView):
+  form_class = ArticleForm
+  template_name = 'news/article_edit.html'
+
+  def form_valid(self, form):
+    article = form.save(commit=False)
+    article.author = self.request.user
+    #article.image = self.request.FILES
+    article.save()
+    return redirect(article_detail, pk=article.pk)
+"""
+
 @login_required
 def article_new(request):
     if request.method == "POST":
-        form = ArticleForm(request.POST)
+        form = ArticleForm(request.POST, request.FILES)
         if form.is_valid():
             article = form.save(commit=False)
             article.author = request.user
             article.save()
-            return redirect(article_detail, pk=article.pk)
+            return redirect('article_detail', pk=article.pk)
     else:
         form = ArticleForm()
     return render(request, 'news/article_edit.html', {'form': form})
 
+
+#記事編集
 @login_required
 def article_edit(request, pk):
     article = get_object_or_404(Article, pk=pk)
     if article.author != request.user:
         return redirect('article_detail', pk=pk)
     if request.method == "POST":
-        form = ArticleForm(request.POST, instance=article)
+        form = ArticleForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
             article = form.save(commit=False)
             article.author = request.user
+            article.image = request.FILES['file']
             article.save()
             return redirect(article_detail, pk=article.pk)
     else:
         form = ArticleForm(instance=article)
     return render(request, 'news/article_edit.html', {'form': form})
 
+#記事の未公開リスト
 @login_required
 def article_draft_list(request):
     articles=Article.objects.filter(
@@ -110,11 +141,13 @@ def article_draft_list(request):
     ).order_by('created_date')
     return render(request, 'news/article_draft_list.html', {'articles': articles})
 
+#Publishボタンが押された時のView
 @login_required
 def article_publish(request, pk):
     article = get_object_or_404(Article, pk=pk)
     article.publish()
     return redirect('article_detail', pk=pk)
+
 
 @login_required
 def article_remove(request, pk):
@@ -123,20 +156,8 @@ def article_remove(request, pk):
         article.delete()
     return redirect('article_list')
 
-"""
-class CommentAdd(CreateView):
-    model = Comment
-    fields = ['author', 'text', 'evaluation_value']
-    template_name = 'news/add_comment_to_article.html'
 
-    def form_valid(self, form):
-        comment = form.save(commit=False)
-        comment.article = get_object_or_404(Article, pk=self.kwargs['pk'])
-        comment.save()
-        return redirect('article_detail', pk=comment.article.pk)
-"""
-
-def add_comment_to_article(request, pk):
+def add_comment(request, pk):
     article = get_object_or_404(Article, pk=pk)
     if request.method == "POST":
         form = CommentForm(request.POST)
@@ -151,7 +172,7 @@ def add_comment_to_article(request, pk):
     else:
         form = CommentForm()
     
-    return render(request, 'news/add_comment_to_article.html', {'form': form})
+    return render(request, 'news/add_comment.html', {'form': form})
 
 
 @login_required

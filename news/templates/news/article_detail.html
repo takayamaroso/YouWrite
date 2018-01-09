@@ -1,22 +1,23 @@
 {% extends 'news/base.html' %}
 
 {% block content %}
-    <div class="article">
-        {% if article.published_date %}
-            <div class="date">
-                {{ article.published_date }}
-            </div>
-        {% else %}
-            <a class="btn btn-default" href="{% url 'article_publish' pk=article.pk %}">Publish</a>
-        {% endif %}
-        <a class="btn btn-default" href="{% url 'article_edit' pk=article.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        <a class="btn btn-default" href="{% url 'article_remove' pk=article.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
-        <h1>{{ article.title }}</h1>
-        <p>{{ article.text|linebreaks }}</p>
-    </div> 
+    {% if article.published_date %}
+        <div class="date">
+            {{ article.published_date }}
+        </div>
+    {% else %}
+        <a class="btn btn-default" href="{% url 'article_publish' pk=article.pk %}">Publish</a>
+    {% endif %}
+    <a class="btn btn-default" href="{% url 'article_edit' pk=article.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
+    <a class="btn btn-default" href="{% url 'article_remove' pk=article.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
+    <h1>{{ article.title }}</h1>
+    <img src="{{ article.image_url|default_if_none:'' }}" />
+    <br>
+    <p>{{ article.text|linebreaks }}</p>
+
 
     <hr>
-    <a class="btn btn-default" href="{% url 'add_comment_to_article' pk=article.pk %}">コメント追加</a>
+    <a class="btn btn-default" href="{% url 'add_comment' pk=article.pk %}">コメント追加</a>
     {% for comment in article.comments.all %}
         <div class="comment">
             <div class="date">
@@ -26,7 +27,7 @@
             </div>
             <strong>{{ comment.author }}</strong>
             <script>
-                    document.write("<p style='color: rgb(211, 211, 6)'>");
+                    document.write("<p style='color: rgb(211, 105, 6)'>");
                         var num = 0;
                         while ( 5 > num){
                             if ( {{ comment.evaluation_value }} > num){
