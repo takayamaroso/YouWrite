@@ -99,6 +99,7 @@ class ArticleCreateView(CreateView):
     return redirect(article_detail, pk=article.pk)
 """
 
+#記事新規投稿
 @login_required
 def article_new(request):
     if request.method == "POST":
@@ -124,7 +125,6 @@ def article_edit(request, pk):
         if form.is_valid():
             article = form.save(commit=False)
             article.author = request.user
-            article.image = request.FILES['file']
             article.save()
             return redirect(article_detail, pk=article.pk)
     else:

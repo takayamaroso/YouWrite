@@ -10,6 +10,7 @@
         {% if field.help_text %}
           <small style="color: grey">{{ field.help_text|safe }}</small>
         {% endif %}
+        <br>
         {% for error in field.errors %}
           <a style="color: red">{{ error|striptags }}</a>
         {% endfor %}
