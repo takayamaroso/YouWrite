@@ -9,7 +9,7 @@ class Article(models.Model):
             default=timezone.now)
     published_date = models.DateTimeField(
             blank=True, null=True)
-    image = models.ImageField(blank=True, upload_to='media/', default='media/no-image.jpg')
+    image = models.ImageField(blank=True, upload_to='images/', default='images/no-image.jpg')
 
     def publish(self):
         self.published_date = timezone.now()
