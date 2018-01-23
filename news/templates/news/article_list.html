@@ -1,5 +1,7 @@
 {% extends 'news/base.html' %}
-
+{% block title %}
+  <title>YouWrite</title>
+{% endblock %}
 {% block content %}
     {% for article in articles %}
         <div class="article">

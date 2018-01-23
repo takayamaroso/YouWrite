@@ -13,7 +13,9 @@ from django.views.generic.list import ListView
 from django.db.models import Avg, Count
 # Create your views here.
 
+#－－－－－－－－記事リスト－－－－－－－－－－
 def article_list(request):
+    #検索窓の内容の検知
     if request.GET.get('search') is None:
         article_list = Article.objects\
             .filter(published_date__lte=timezone.now())\
@@ -37,6 +39,7 @@ def article_list(request):
 
 #投稿順
 def article_oldlist(request):
+    #検索窓の内容の検知
     if request.GET.get('search') is None:
         article_list = Article.objects\
             .filter(published_date__lte=timezone.now())\
@@ -60,6 +63,7 @@ def article_oldlist(request):
 
 #評価順表示
 def article_evaluationlist(request):
+    #検索窓の内容の検知
     if request.GET.get('search') is None:
         article_list = Article.objects\
             .filter(published_date__lte=timezone.now())\
@@ -81,23 +85,25 @@ def article_evaluationlist(request):
         articles = paginator.page(paginator.num_pages) #ページが範囲外の時最終ページを表示する
     return render(request, 'news/article_list.html', {'articles':articles})
 
+#記事の未公開リスト
+@login_required
+def article_draft_list(request):
+    articles=Article.objects.filter(
+        published_date__isnull=True
+    ).filter(
+        author=request.user
+    ).order_by('created_date')
+    return render(request, 'news/article_draft_list.html', {'articles': articles})
+
+
+#－－－－－－－－記事－－－－－－－－－－
+
+#記事の内容
 def article_detail(request, pk):
     article = get_object_or_404(Article, pk=pk)
     #article.objects.order_by('-comments__created_date')
     return render(request, 'news/article_detail.html', {'article': article})
 
-"""
-class ArticleCreateView(CreateView):
-  form_class = ArticleForm
-  template_name = 'news/article_edit.html'
-
-  def form_valid(self, form):
-    article = form.save(commit=False)
-    article.author = self.request.user
-    #article.image = self.request.FILES
-    article.save()
-    return redirect(article_detail, pk=article.pk)
-"""
 
 #記事新規投稿
 @login_required
@@ -131,15 +137,6 @@ def article_edit(request, pk):
         form = ArticleForm(instance=article)
     return render(request, 'news/article_edit.html', {'form': form})
 
-#記事の未公開リスト
-@login_required
-def article_draft_list(request):
-    articles=Article.objects.filter(
-        published_date__isnull=True
-    ).filter(
-        author=request.user
-    ).order_by('created_date')
-    return render(request, 'news/article_draft_list.html', {'articles': articles})
 
 #Publishボタンが押された時のView
 @login_required
@@ -149,6 +146,7 @@ def article_publish(request, pk):
     return redirect('article_detail', pk=pk)
 
 
+#記事の削除
 @login_required
 def article_remove(request, pk):
     article = get_object_or_404(Article, pk=pk)
@@ -156,7 +154,8 @@ def article_remove(request, pk):
         article.delete()
     return redirect('article_list')
 
-
+#－－－－－－－－コメント－－－－－－－－－－
+#コメント追加
 def add_comment(request, pk):
     article = get_object_or_404(Article, pk=pk)
     if request.method == "POST":
@@ -174,19 +173,14 @@ def add_comment(request, pk):
     
     return render(request, 'news/add_comment.html', {'form': form})
 
-
-@login_required
-def comment_approve(request, pk):
-    comment = get_object_or_404(Comment, pk=pk)
-    comment.approve()
-    return redirect('article_detail', pk=comment.article.pk)
-
+#コメント削除
 @login_required
 def comment_remove(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
     comment.delete()
     return redirect('article_detail', pk=comment.article.pk)
 
+#新規登録
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)

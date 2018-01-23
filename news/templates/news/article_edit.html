@@ -1,5 +1,7 @@
 {% extends 'news/base.html' %}
-
+{% block title %}
+  <title>YouWrite|記事編集</title>
+{% endblock %}
 {% block content %}
     <h1>記事編集</h1>
     <form method="POST" enctype="multipart/form-data">{% csrf_token %}
@@ -16,6 +18,6 @@
                 {% endfor %}
             </p>
         {% endfor %}
-        <button type="submit" class="save btn btn-default">Save</button>
+        <button type="submit" class="save btn btn-default">保存</button>
     </form>
 {% endblock %}

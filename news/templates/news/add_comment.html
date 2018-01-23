@@ -1,7 +1,9 @@
 {% extends 'news/base.html' %}
-
+{% block title %}
+  <title>YouWrite|コメント追加</title>
+{% endblock %}
 {% block content %}
-  <h1>New comment</h1>
+  <h1>コメント追加</h1>
   <form method="POST">{% csrf_token %}
      {% for field in form %}
       <p>
@@ -16,6 +18,6 @@
         {% endfor %}
       </p>
     {% endfor %}
-    <button type="submit" class="save btn btn-default">Send</button>
+    <button type="submit" class="save btn btn-default">送信</button>
   </form>
 {% endblock %}

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 # Create your models here.
+#記事のモデル
 class Article(models.Model):
     author = models.ForeignKey('auth.User')#外部キー　多対１
     title = models.CharField(max_length=200)
@@ -11,12 +12,10 @@ class Article(models.Model):
             blank=True, null=True)
     image = models.ImageField(blank=True, upload_to='images/', default='images/no-image.jpg')
 
+    #記事公開
     def publish(self):
         self.published_date = timezone.now()
         self.save()
-
-    def comments(self):
-        return self.comments#.filter(approved_comment=True)
 
     def __str__(self):
         return self.title
@@ -25,14 +24,6 @@ class Article(models.Model):
     def image_url(self):
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
-        
-    """
-    def get_image_path(self, filename):
-        prefix = 'images/'
-        name = self.author
-        extension = os.path.splitext(filename)[-1]
-        return prefix + name + extension
-    """
 
 class Comment(models.Model):
     #外部キー　多対１

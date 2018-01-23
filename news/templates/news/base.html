@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>try</title>
+        {% block title %}
+        {% endblock %}
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- Bootstrap -->
         <link href="{% static 'css/theme.min.css' %}" rel="stylesheet" media="screen">
@@ -27,7 +28,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="#">
-                        <img src="{% static 'image/i3.png' %}"style="height:20px;">		<!--アイコンの画像-->
+                        <img src="{% static 'image/i3.png' %}"style="height:30px;">		<!--アイコンの画像-->
                     </a>
                         <a class="navbar-brand text-center" href="/">YouWrite</a>		<!--タイトル-->
                 </div>

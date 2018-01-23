@@ -1,12 +1,15 @@
 {% extends 'news/base.html' %}
 
+{% block title %}
+  <title>YouWrite|{{ article.title }}</title>
+{% endblock %}
 {% block content %}
     {% if article.published_date %}
         <div class="date">
             {{ article.published_date }}
         </div>
     {% else %}
-        <a class="btn btn-default" href="{% url 'article_publish' pk=article.pk %}">Publish</a>
+        <a class="btn btn-default" href="{% url 'article_publish' pk=article.pk %}">公開</a>
     {% endif %}
     <a class="btn btn-default" href="{% url 'article_edit' pk=article.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
     <a class="btn btn-default" href="{% url 'article_remove' pk=article.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
@@ -22,7 +25,7 @@
         <div class="comment">
             <div class="date">
                 {{ comment.created_date }}
-                <a class="btn btn-default" href="{% url 'comment_remove' pk=comment.pk %}"><span class="glyphicon glyphicon-remove"></span></span></a>
+                <!--a class="btn btn-default" href="{% url 'comment_remove' pk=comment.pk %}"><span class="glyphicon glyphicon-remove"></span></span></a-->
                 <br>
             </div>
             <strong>{{ comment.author }}</strong>
